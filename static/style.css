@@ -1,0 +1,134 @@
+/* reset básico*/
+*{
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #ff8c00;;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    
+}
+
+.container {
+    max-width: 550px;
+    width: 100%;
+    margin: auto;
+    padding: 15px;
+}
+
+.titulo {
+    text-align: center;
+    color: #ffffff;
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+}
+
+.subtitulo {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.produto {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.produto label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 10px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.btn-principal {
+    width: 100%;
+    padding: 15px;
+    background: #25d366;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-principal:hover {
+    background: #1ebe5d;
+}
+
+
+ .controle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.controle button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    border-radius: 6px;
+    border: 1px solid #fdeaea;
+    cursor: pointer;
+    margin: 8px 6px 8px 0px;
+}
+
+.qtd {
+    min-width: 20px;
+    text-align: center;
+    font-weight: bold;
+    
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 15px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+
+.pagamento_pix{
+    display: none;
+    margin-top: 20px;
+    text-align: center;
+    background: #ffffff;;
+    padding: 5px;
+    border-radius: 6px;   
+}
+
+
+div.pagamento_pix >button{
+    background: #31db6f;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-style: none;
+    font-size: 20px;
+    color: white;
+    border-radius: 6px;
+}
+
+.total{
+    background: white;
+    display: block;
+    width: 40%;
+}

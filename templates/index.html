@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="container">
+
+{% if not loja_aberta %}
+<div style="background:red; color:white; padding:10px; text-align:center;">
+    🚫 Loja fechada
+</div>
+{% endif %}
+
+<h1 class="titulo">🥟 Salgados da Edna</h1>
+<h2 class="subtitulo">Cardápio</h2>
+
+<form id="pedidoForm" method="POST" action="/salvar_pedido">
+
+    {% for produto in produtos %}
+    <div class="produto"
+         data-nome="{{ produto['nome'] }}"
+         data-preco="{{ produto['preco'] }}">
+
+        <span class="nome-produto">{{ produto['nome'] }}</span>
+
+        <div class="controle">
+            <button type="button" class="mais">+</button>
+            <span class="qtd">0</span>
+            <button type="button" class="menos">−</button>
+        </div>
+
+        <strong class="preco">
+            R$ {{ '%.2f'|format(produto['preco']) }}
+        </strong>
+    </div>
+    {% endfor %}
+
+    <input type="hidden" name="itens_json" id="itensJson">
+    <input type="hidden" name="total" id="totalInput">
+
+    <h3 class="total">Total: R$ <span id="total">0.00</span></h3>
+
+    <label for="nome">Seu nome:</label>
+    <input type="text" id="nome" name="nome" required>
+
+    {% if loja_aberta %}
+        <label for="telefone">Seu WhatsApp</label>
+        <input type="text" id="telefone" name="telefone" placeholder="559999999999">
+
+        <label for="observacao"><strong>Observações do pedido (opcional)</strong></label>
+        <textarea 
+            id="observacao"
+            name="observacao"
+            placeholder="Ex: 60 coxinhas e 40 kibes"
+            rows="3">
+        </textarea>
+    
+        <button id="finalizar" type="button" class="btn-principal">
+            Finalizar pedido
+        </button>
+    {% else %}
+        <p style="color:red;font-weight:bold">
+            ❌ Não é possível pedir com a loja fechada
+        </p>
+    {% endif %}
+</form>
+
+
+<div id="pixInfo" class="pagamento_pix"> 
+    <h3>faça o pagamento via Pix</h3>
+    <p>Chave PIX: <strong>11122233344</strong></p>
+    <p>Total: R$ <span id="totalPix">0.00</span></p>
+
+    <button id="confirmarPix">Confirmar pagamento PIX</button>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const produtos = document.querySelectorAll('.produto');
+    const botaoFlutuante = document.getElementById('botaoFlutuante');
+    const pixInfo = document.getElementById('pixInfo');
+
+    let itens = [];
+
+    function atualizarBotaoFlutuante() {
+        if (!botaoFlutuante) return; // evita erro quando não existir
+        if (itens.length > 0) {
+            botaoFlutuante.classList.add("mostrar");
+        } else {
+            botaoFlutuante.classList.remove("mostrar");
+        }
+    }
+
+    function atualizarTotal() {
+        let total = 0;
+        itens.forEach(item => {
+            total += item.quantidade * item.preco;
+        });
+
+        document.getElementById('total').textContent = total.toFixed(2);
+        document.getElementById('totalInput').value = total.toFixed(2);
+        document.getElementById('itensJson').value = JSON.stringify(itens);
+
+        // atualiza total do PIX
+        document.getElementById('totalPix').textContent = total.toFixed(2);
+    }
+
+    function atualizarItens(nome, preco, qtd) {
+        itens = itens.filter(i => i.produto !== nome);
+
+        if (qtd > 0) {
+            itens.push({ produto: nome, quantidade: qtd, preco: preco });
+        }
+
+        atualizarBotaoFlutuante();
+        atualizarTotal();
+    }
+
+    produtos.forEach(prod => {
+        const mais = prod.querySelector('.mais');
+        const menos = prod.querySelector('.menos');
+        const qtdSpan = prod.querySelector('.qtd');
+        const nome = prod.dataset.nome;
+        const preco = parseFloat(prod.dataset.preco);
+
+        mais.addEventListener('click', () => {
+            let qtd = parseInt(qtdSpan.textContent.trim(), 10);
+            qtd++;
+            qtdSpan.textContent = qtd;
+            atualizarItens(nome, preco, qtd);
+        });
+
+        menos.addEventListener('click', () => {
+            let qtd = parseInt(qtdSpan.textContent.trim(), 10);
+            if (qtd > 0) {
+                qtd--;
+                qtdSpan.textContent = qtd;
+                atualizarItens(nome, preco, qtd);
+            }
+        });
+    });
+
+    // FINALIZAR → mostra PIX
+    document.getElementById("finalizar").addEventListener("click", function() {
+        const nome = document.getElementById("nome").value;
+        const telefone = document.getElementById("telefone").value;
+
+        if (!nome || !telefone) {
+            alert("Preencha nome e WhatsApp!");
+            return;
+        }
+
+        if (itens.length === 0) {
+            alert("Selecione pelo menos um item!");
+            return;
+        }
+
+        pixInfo.style.display = "block";
+    });
+
+    // CONFIRMAR PIX → abre whatsapp com mensagem PIX
+    document.getElementById("confirmarPix").addEventListener("click", function() {
+        const nome = document.getElementById("nome").value;
+        const telefone = document.getElementById("telefone").value;
+
+        let mensagem = `🧾 *Pedido PIX* \n`;
+        mensagem += `*Nome:* ${nome}\n`;
+        mensagem += `*WhatsApp:* ${telefone}\n\n`;
+        mensagem += `*Itens:*\n`;
+
+        let total = 0;
+        itens.forEach(item => {
+            const subtotal = item.quantidade * item.preco;
+            total += subtotal;
+            mensagem += `- ${item.produto} (${item.quantidade}x) R$ ${subtotal.toFixed(2)}\n`;
+        });
+
+        mensagem += `\n*Total:* R$ ${total.toFixed(2)}\n`;
+        mensagem += `*Forma de pagamento:* PIX`;
+
+        const mensagemCodificada = encodeURIComponent(mensagem);
+        const numeroDona = "5527998825127";
+
+        window.open(`https://api.whatsapp.com/send?phone=${numeroDona}&text=${mensagemCodificada}`, "_blank");
+    });
+
+    // RETIRADA NO BALCÃO → abre whatsapp com mensagem de retirada
+    document.getElementById("retiradaBalcao").addEventListener("click", function() {
+        const nome = document.getElementById("nome").value;
+        const telefone = document.getElementById("telefone").value;
+
+        let mensagem = `🧾 *Pedido Retirada no Balcão* \n`;
+        mensagem += `*Nome:* ${nome}\n`;
+        mensagem += `*WhatsApp:* ${telefone}\n\n`;
+        mensagem += `*Itens:*\n`;
+
+        let total = 0;
+        itens.forEach(item => {
+            const subtotal = item.quantidade * item.preco;
+            total += subtotal;
+            mensagem += `- ${item.produto} (${item.quantidade}x) R$ ${subtotal.toFixed(2)}\n`;
+        });
+
+        mensagem += `\n*Total:* R$ ${total.toFixed(2)}\n`;
+        mensagem += `*Forma de pagamento:* Retirada no balcão`;
+
+        const mensagemCodificada = encodeURIComponent(mensagem);
+        const numeroDona = "5527998825127";
+
+        window.open(`https://api.whatsapp.com/send?phone=${numeroDona}&text=${mensagemCodificada}`, "_blank");
+    });
+
+});
+</script>
+
+</div>
+</body>
+</html>

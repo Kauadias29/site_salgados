@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <tittle>admin - Loja</tittle>
+</head>
+<body>
+    <h1>Painel da Dona</h1>
+
+   {% if loja_aberta %}
+    <p style="color: green; font-weight: bold;">
+       ✅ Loja está ABERTA 
+    </p>
+
+    <a href="/admin/toggle_loja">
+        <button>Fechar Loja</button>
+    </a>
+{% else %}
+    <p style="color: red; font-weight: bold;">
+       🚫 Loja está FECHADA
+    </p>
+
+    <a href="/admin/toggle_loja">
+        <button>Abrir Loja</button>
+    </a>
+{% endif %}
+
+<br><br>
+
+<a href="/">
+    <button>Voltar para o site</button>
+</a>
+
+
+</body>    
