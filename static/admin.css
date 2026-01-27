@@ -1,0 +1,91 @@
+/* ===== ADMIN (Mobile Friendly) ===== */
+
+
+/* ===== Ajustes gerais ===== */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+/* ===== Ajustes de formulário ===== */
+form .form-control {
+    border-radius: 10px;
+}
+
+/* ===== Ajustes de lista ===== */
+.list-group-item {
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+/* ===== Ajustes no mobile ===== */
+@media (max-width: 768px) {
+
+    .container {
+        padding: 12px !important;
+    }
+
+    .card {
+        padding: 12px !important;
+    }
+
+    .card-body {
+        padding: 12px !important;
+    }
+
+    /* Formulário em 1 coluna no mobile */
+    form.row.g-3 {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    form .col-md-6,
+    form .col-md-4,
+    form .col-md-12,
+    form .col-md-2 {
+        width: 100% !important;
+    }
+
+    /* Botão adicionar maior */
+    form .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    /* Ajuste da lista */
+    .list-group-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .list-group-item .d-flex {
+        width: 100%;
+    }
+
+    .list-group-item img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .list-group-item a {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Botão voltar / abrir loja */
+    .alert .btn {
+        width: auto;
+    }
+
+    /* Espaço maior no final */
+    .text-center {
+        margin-top: 18px;
+    }
+}
+

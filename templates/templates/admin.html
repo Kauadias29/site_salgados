@@ -1,0 +1,82 @@
+!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Loja</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            width: 300px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .status {
+            font-size: 22px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .aberta {
+            color: green;
+        }
+
+        .fechada {
+            color: red;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .abrir {
+            background: #25d366;
+            color: white;
+        }
+
+        .fechar {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Controle da Loja</h1>
+
+    {% if status == 1 %}
+        <div class="status aberta">🟢 Loja Aberta</div>
+        <a href="/admin/fechar">
+            <button class="fechar">Fechar Loja</button>
+        </a>
+    {% else %}
+        <div class="status fechada">🔴 Loja Fechada</div>
+        <a href="/admin/abrir">
+            <button class="abrir">Abrir Loja</button>
+        </a>
+    {% endif %}
+</div>
+
+</body>
+</html>

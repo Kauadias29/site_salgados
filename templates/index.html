@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>LMC Delícias</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+
+</head>
+
+
+<body>
+<div class="container">
+
+    {% if not loja_aberta %}
+    <div style="background:red; color:white; padding:10px; text-align:center;">
+        🚫 Loja fechada
+    </div>
+    {% endif %}
+
+    <h1 class="titulo">🥟 Salgados da Edna</h1>
+    <h2 class="subtitulo">Cardápio</h2>
+
+    <!-- PRODUTOS -->
+    {% for produto in produtos %}
+    <div class="produto"
+         data-nome="{{ produto['nome'] }}"
+         data-preco="{{ produto['preco'] }}">
+
+        {% if produto['imagem'] %}
+        <img src="{{ url_for('static', filename='uploads/' ~ produto['imagem']) }}"
+             class="img-produto">
+        {% endif %}
+
+        <div class="info-produto">
+            <span class="nome-produto">{{ produto['nome'] }}</span>
+
+            <div class="controle">
+                <button type="button" class="mais">+</button>
+                <span class="qtd">0</span>
+                <button type="button" class="menos">-</button>
+            </div>
+
+            <strong class="preco">
+                R$ {{ '%.2f'|format(produto['preco']) }}
+            </strong>
+        </div>
+    </div>
+    {% endfor %}
+
+    <button type="button" onclick="setTipo('normal')">Comprar na hora</button>
+    <button type="button" onclick="setTipo('encomenda')">Encomendar</button>
+
+    <input type="hidden" id="tipo_pedido" name="tipo_pedido" value="normal">
+
+
+    <!-- FINAL -->
+    <div class="card-final">
+
+        <div class="total">
+            Total: R$ <span id="total">0.00</span>
+        </div>
+
+        <label>Seu nome</label>
+        <input type="text" id="nome">
+
+        <label>Seu WhatsApp</label>
+        <input type="text" id="telefone">
+
+        <label>Observação</label>
+        <input type="text" id="obs">
+
+        <button type="button" id="finalizarPedido" class="btn-finalizar">
+            Finalizar pedido
+        </button>
+    </div>
+
+    <!-- PIX -->
+    <div id="pixInfo" class="card-final" style="display:none;">
+        <p>💰 Total PIX: R$ <span id="totalPix">0.00</span></p>
+
+          <p>🔑 <strong>Chave PIX:</strong><br>
+
+          <div class="pix-box">
+                <span id="pixChave">27998825127</span>
+                <button id="copiarPix">📋 Copiar</button>
+           </div>
+
+        <button id="confirmarPix">Confirmar PIX</button>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const produtos = document.querySelectorAll(".produto");
+    const totalSpan = document.getElementById("total");
+    const totalPixSpan = document.getElementById("totalPix");
+    const pixInfo = document.getElementById("pixInfo");
+    const btnFinalizar = document.getElementById("finalizarPedido");
+
+    let itens = [];
+
+    function atualizarTotais() {
+        let total = 0;
+        itens.forEach(i => total += i.quantidade * i.preco);
+        totalSpan.textContent = total.toFixed(2);
+        totalPixSpan.textContent = total.toFixed(2);
+    }
+
+    function atualizarItem(nome, preco, qtd) {
+        itens = itens.filter(i => i.produto !== nome);
+        if (qtd > 0) {
+            itens.push({ produto: nome, quantidade: qtd, preco });
+        }
+        atualizarTotais();
+    }
+
+
+    // + e -
+    produtos.forEach(prod => {
+        const btnMais = prod.querySelector(".mais");
+        const btnMenos = prod.querySelector(".menos");
+        const qtdSpan = prod.querySelector(".qtd");
+
+        const nome = prod.dataset.nome;
+        const preco = parseFloat(prod.dataset.preco);
+
+        btnMais.addEventListener("click", () => {
+            let qtd = parseInt(qtdSpan.textContent);
+            qtd++;
+            qtdSpan.textContent = qtd;
+            atualizarItem(nome, preco, qtd);
+        });
+
+        btnMenos.addEventListener("click", () => {
+            let qtd = parseInt(qtdSpan.textContent);
+            if (qtd > 0) {
+                qtd--;
+                qtdSpan.textContent = qtd;
+                atualizarItem(nome, preco, qtd);
+            }
+        });
+    });
+
+    // Finalizar
+    btnFinalizar.addEventListener("click", () => {
+        if (itens.length === 0) {
+            alert("Selecione ao menos um item");
+            return;
+        }
+        pixInfo.style.display = "block";
+        atualizarTotais();
+    });
+
+    document.getElementById("confirmarPix").addEventListener("click", () => {
+        enviarWhats("PIX");
+    });
+
+    
+
+    function enviarWhats(tipo) {
+        const nome = document.getElementById("nome").value;
+        const tel = document.getElementById("telefone").value;
+        const obs = document.getElementById("obs").value;
+
+        if (!nome || !tel) {
+            alert("Preencha nome e WhatsApp");
+            return;
+        }
+
+        let msg = `🧾 *Pedido*\n`;
+        msg += `*Nome:* ${nome}\n`;
+        msg += `*WhatsApp:* ${tel}\n\n`;
+        msg += `*Itens:*\n`;
+
+        let total = 0;
+        itens.forEach(i => {
+            const sub = i.quantidade * i.preco;
+            total += sub;
+            msg += `- ${i.produto} (${i.quantidade}x) R$ ${sub.toFixed(2)}\n`;
+        });
+
+        msg += `\n*Total:* R$ ${total.toFixed(2)}\n`;
+        msg += `*Pagamento:* ${tipo}\n`;
+
+        if (obs) msg += `*Obs:* ${obs}`;
+
+        window.open(
+            `https://api.whatsapp.com/send?phone=5527998825127&text=${encodeURIComponent(msg)}`,
+            "_blank"
+        );
+    }
+
+   const botaoCopiar = document.getElementById("copiarPix");
+
+    if (botaoCopiar) {
+        botaoCopiar.addEventListener("click", async () => {
+            const chavePix = document.getElementById("pixChave").innerText;
+
+        // Tenta copiar automaticamente
+        try {
+            await navigator.clipboard.writeText(chavePix);
+            botaoCopiar.innerText = "✅ Copiado!";
+            setTimeout(() => {
+                botaoCopiar.innerText = "📋 Copiar";
+            }, 2000);
+            return;
+        } catch (err) {
+            // Se não der, cai no fallback
+        }
+
+        // Fallback (funciona em praticamente todos os navegadores)
+        const textarea = document.createElement("textarea");
+        textarea.value = chavePix;
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+
+        try {
+            document.execCommand("copy");
+            botaoCopiar.innerText = "✅ Copiado!";
+            setTimeout(() => {
+                botaoCopiar.innerText = "📋 Copiar";
+            }, 2000);
+        } catch (err) {
+            alert("Não foi possível copiar automaticamente. Selecione o número e copie manualmente.");
+        }
+
+        document.body.removeChild(textarea);
+    });
+}
+
+
+
+});
+</script>
+
+</body>
+</html>
