@@ -19,7 +19,9 @@
     </div>
     {% endif %}
 
-    <h1 class="titulo">🥟 LMC DELÍCIAS</h1>
+    <h1 class="titulo">LMC DELICIAS 😍</h1>
+
+    
     <h2 class="subtitulo">Cardápio</h2>
 
     <!-- PRODUTOS -->
@@ -29,8 +31,10 @@
          data-preco="{{ produto['preco'] }}">
 
         {% if produto['imagem'] %}
-        <img src="{{ url_for('static', filename='uploads/' ~ produto['imagem']) }}"
-             class="img-produto">
+         <img
+            src="{{ url_for('static', filename='uploads/' ~ produto.imagem) }}"
+            class="img-produto"
+          >
         {% endif %}
 
         <div class="info-produto">
@@ -49,8 +53,7 @@
     </div>
     {% endfor %}
 
-    <button type="button" onclick="setTipo('normal')">Comprar na hora</button>
-    <button type="button" onclick="setTipo('encomenda')">Encomendar</button>
+
 
     <input type="hidden" id="tipo_pedido" name="tipo_pedido" value="normal">
 
