@@ -265,7 +265,7 @@ def admin():
         imagem = request.files.get('imagem')
 
         # imagem padrão
-        nome_arquivo = "sem-imagem.png"
+        nome_arquivo = None
 
         # se enviou imagem
         if imagem and imagem.filename != "":

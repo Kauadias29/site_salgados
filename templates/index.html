@@ -25,33 +25,28 @@
     <h2 class="subtitulo">Cardápio</h2>
 
     <!-- PRODUTOS -->
-    {% for produto in produtos %}
-    <div class="produto"
-         data-nome="{{ produto['nome'] }}"
-         data-preco="{{ produto['preco'] }}">
+   {% for produto in produtos %}
+<div class="produto"
+     data-nome="{{ produto.nome }}"
+     data-preco="{{ produto.preco }}">
 
-        {% if produto['imagem'] %}
-         <img
-            src="{{ url_for('static', filename='uploads/' ~ produto.imagem) }}"
-            class="img-produto"
-          >
-        {% endif %}
+    
 
-        <div class="info-produto">
-            <span class="nome-produto">{{ produto['nome'] }}</span>
+    <div class="info-produto">
+        <span class="nome-produto">{{ produto.nome }}</span>
 
-            <div class="controle">
-                <button type="button" class="mais">+</button>
-                <span class="qtd">0</span>
-                <button type="button" class="menos">-</button>
-            </div>
-
-            <strong class="preco">
-                R$ {{ '%.2f'|format(produto['preco']) }}
-            </strong>
+        <div class="controle">
+            <button type="button" class="mais">+</button>
+            <span class="qtd">0</span>
+            <button type="button" class="menos">-</button>
         </div>
+
+        <strong class="preco">
+            R$ {{ '%.2f'|format(produto.preco) }}
+        </strong>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
 
 
 

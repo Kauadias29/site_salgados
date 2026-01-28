@@ -33,7 +33,6 @@ body {
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 15px;
-    display: flex;
     align-items: center;
     gap: 15px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -41,13 +40,16 @@ body {
 
 /* ====== IMAGEM (opcional) ====== */
 .img-produto {
-    width: 80px;
-    height: 80px;
+    display: block;       /* apenas se existir imagem */
+    max-width: 80px;
+    max-height: 80px;
     object-fit: contain;
     border-radius: 10px;
-    background: #f3f3f3;
-    flex-shrink: 0;
+    /* remove background */
+    background: none;
 }
+
+
 
 /* ====== INFO ====== */
 .info-produto {
@@ -260,6 +262,12 @@ button:hover,
     cursor: pointer;
 }
 
+/* Remove layout de imagem quando não existir img */
+.produto:not(:has(.img-produto)) {
+    display: block;
+}
+
+
 @media (max-width: 600px) {
 
     .container {
@@ -274,6 +282,11 @@ button:hover,
         padding: 12px;
         border-radius: 12px;
     }
+
+    .produto:not(:has(.img-produto)) {
+    display: block;
+}
+
 
     .img-produto {
         width: 120px;
@@ -326,3 +339,7 @@ button:hover,
     }
 }
 
+/* Remove espaço da imagem quando NÃO existir img */
+.produto:not(:has(.img-produto)) {
+    display: block !important;
+}
