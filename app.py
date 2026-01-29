@@ -28,6 +28,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
 )
 
 db = SQLAlchemy(app)
+with app.app_context():
+        db.create_all()
 
 # ================= MODELS =================
 class Produto(db.Model):
