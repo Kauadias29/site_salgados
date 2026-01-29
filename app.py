@@ -10,26 +10,18 @@ import os
 app = Flask(__name__)
 app.secret_key = "uma_senha_muito_forte_aqui"
 
-# Uploads
 UPLOAD_FOLDER = "static/uploads"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 MAX_SIZE = (800, 800)
 
-# Database via ENV (Internal URL do Render)
+# Database via ENV
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     "SQLALCHEMY_DATABASE_URI",
-    "sqlite:///local.db"  # fallback local
+    "sqlite:///local.db"
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    "SQLALCHEMY_DATABASE_URI",
-    "sqlite:///local.db"  # <-- fallback local
-)
-
 db = SQLAlchemy(app)
-with app.app_context():
-        db.create_all()
 
 # ================= MODELS =================
 class Produto(db.Model):
@@ -60,24 +52,19 @@ class Item(db.Model):
 
 # ================= FUNÇÕES =================
 def criar_registros_iniciais():
-    with app.app_context():
-        db.create_all()
+    if not Loja.query.get(1):
+        loja = Loja(id=1, aberta=True)
+        db.session.add(loja)
 
-        # Loja inicial
-        if not Loja.query.get(1):
-            loja = Loja(id=1, aberta=True)
-            db.session.add(loja)
+    if Produto.query.count() == 0:
+        produtos = [
+            Produto(nome="Coxinha", preco=5.00, imagem="Coxinha.png"),
+            Produto(nome="Refrigerante", preco=7.00, imagem="sem-imagem.png"),
+            Produto(nome="Cento de salgado", preco=50.00, imagem="sem-imagem.png")
+        ]
+        db.session.add_all(produtos)
 
-        # Produtos iniciais
-        if Produto.query.count() == 0:
-            produtos = [
-                Produto(nome="Coxinha", preco=5.00, imagem="Coxinha.png"),
-                Produto(nome="Refrigerante", preco=7.00, imagem="sem-imagem.png"),
-                Produto(nome="Cento de salgado", preco=50.00, imagem="sem-imagem.png")
-            ]
-            db.session.add_all(produtos)
-
-        db.session.commit()
+    db.session.commit()
 
 def salvar_imagem_redimensionada(imagem, caminho):
     img = Image.open(imagem)
@@ -125,8 +112,8 @@ def salvar_pedido():
         subtotal = item["quantidade"] * item["preco"]
         mensagem += f"- {item['produto']} ({item['quantidade']}x) R$ {subtotal:.2f}\n"
     mensagem += f"\nTotal: R$ {total:.2f}"
-    mensagem_codificada = quote(mensagem)
 
+    mensagem_codificada = quote(mensagem)
     whatsapp_dona = "5527998825127"
     url_whatsapp = f"https://api.whatsapp.com/send?phone={whatsapp_dona}&text={mensagem_codificada}"
 
@@ -171,14 +158,17 @@ def toggle_loja():
 def add_produto():
     if not session.get("logado"):
         return redirect("/admin/login")
+
     nome = request.form.get('nome')
-    preco = request.form.get('preco')
+    preco = float(request.form.get('preco'))
     imagem = request.files.get('imagem')
     nome_arquivo = None
+
     if imagem and imagem.filename != "":
         nome_arquivo = secure_filename(imagem.filename)
         caminho = os.path.join(app.config['UPLOAD_FOLDER'], nome_arquivo)
         salvar_imagem_redimensionada(imagem, caminho)
+
     produto = Produto(nome=nome, preco=preco, imagem=nome_arquivo)
     db.session.add(produto)
     db.session.commit()
@@ -194,9 +184,14 @@ def remover_produto(id):
         db.session.commit()
     return redirect("/admin")
 
-# ================= MAIN =================
-if __name__ == "__main__":
-    criar_registros_iniciais()
+# ================= INICIALIZAÇÃO =================
+with app.app_context():
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
+
+    db.create_all()
+    criar_registros_iniciais()
+
+# ================= MAIN =================
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
