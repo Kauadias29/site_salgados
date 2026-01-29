@@ -267,6 +267,109 @@ button:hover,
     display: block;
 }
 
+/* ===== LOGIN DA DONA ===== */
+.login-container {
+    max-width: 350px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ff9800;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-container button:hover {
+    background: #e68900;
+}
+
+/* ===== PAINEL ADMIN ===== */
+.admin-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 15px;
+}
+
+.admin-container table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.admin-container th, .admin-container td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.admin-container tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.admin-container a {
+    color: #ff9800;
+    text-decoration: none;
+}
+
+.admin-container a:hover {
+    text-decoration: underline;
+}
+
+/* ===== RESPONSIVO PARA MOBILE ===== */
+@media (max-width: 600px) {
+    .login-container {
+        margin: 30px 10px;
+        padding: 15px;
+    }
+
+    .login-container input,
+    .login-container button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .admin-container {
+        margin: 10px 5px;
+        padding: 10px;
+    }
+
+    .admin-container table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .admin-container th, .admin-container td {
+        padding: 6px;
+    }
+}
+
+
 
 @media (max-width: 600px) {
 
