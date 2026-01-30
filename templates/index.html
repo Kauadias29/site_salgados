@@ -72,6 +72,12 @@
         <button type="button" id="finalizarPedido" class="btn-finalizar">
             Finalizar pedido
         </button>
+
+        {% if not loja_aberta %}
+        <p style="color: red; text-align: center; margin-top: 10px;">
+            A loja está fechada no momento. Volte mais tarde !
+        </p>
+        {% endif %}
     </div>
 
     <!-- PIX -->
@@ -90,8 +96,7 @@
 
 </div>
 
-<script>
-
+<<script>
 document.addEventListener("DOMContentLoaded", () => {
 
     const produtos = document.querySelectorAll(".produto");
@@ -102,6 +107,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let itens = [];
 
+    // ================= BLOQUEIO LOJA =================
+    const lojaAberta = {{ 'true' if loja_aberta else 'false' }};
+    
+    if (!lojaAberta) {
+        btnFinalizar.disabled = true; // bloqueia o botão
+        btnFinalizar.style.opacity = 0.5; // efeito visual
+        btnFinalizar.title = "Loja fechada no momento"; // tooltip
+    }
+
+    // ================= FUNÇÕES =================
     function atualizarTotais() {
         let total = 0;
         itens.forEach(i => total += i.quantidade * i.preco);
@@ -145,6 +160,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // FINALIZAR
     btnFinalizar.addEventListener("click", () => {
+        if (!lojaAberta) {
+            alert("A loja está fechada no momento. Volte mais tarde!");
+            return;
+        }
+
         if (itens.length === 0) {
             alert("Selecione ao menos um item");
             return;
@@ -167,6 +187,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function enviarWhats(tipo) {
+        if (!lojaAberta) {
+            alert("A loja está fechada no momento. Volte mais tarde!");
+            return;
+        }
+
         const nome = document.getElementById("nome").value;
         const tel = document.getElementById("telefone").value;
         const obs = document.getElementById("obs").value;
@@ -217,8 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
-
 </script>
+
+
 
 </body>
 </html>

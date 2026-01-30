@@ -3,7 +3,9 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-body {
+html, body {
+    height: auto;       /* garante que o scroll funcione */
+    overflow-y: auto;
     margin: 0;
     background: #ff9800;
 }
@@ -33,6 +35,7 @@ body {
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 15px;
+    display: flex;
     align-items: center;
     gap: 15px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -40,16 +43,13 @@ body {
 
 /* ====== IMAGEM (opcional) ====== */
 .img-produto {
-    display: block;       /* apenas se existir imagem */
+    display: block;
     max-width: 80px;
     max-height: 80px;
     object-fit: contain;
     border-radius: 10px;
-    /* remove background */
     background: none;
 }
-
-
 
 /* ====== INFO ====== */
 .info-produto {
@@ -106,6 +106,7 @@ body {
     margin-top: 15px;
 }
 
+/* ====== INPUTS ====== */
 input {
     width: 100%;
     padding: 10px;
@@ -165,22 +166,15 @@ button:hover,
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-/* ====== TOTAL ====== */
-.total {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 20px; /* 👈 espaçamento bonito */
-}
-
 /* ====== LABELS ====== */
 .card-final label {
     display: block;
-    margin-top: 12px;   /* 👈 espaço entre campos */
+    margin-top: 12px;
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-/* ====== INPUTS ====== */
+/* ====== INPUTS CARD FINAL ====== */
 .card-final input {
     width: 100%;
     padding: 12px;
@@ -194,6 +188,7 @@ button:hover,
     background: #2ecc71;
 }
 
+/* ====== PIX ====== */
 .pix-chave {
     font-size: 18px;
     font-weight: bold;
@@ -218,37 +213,7 @@ button:hover,
     padding: 10px;
     border-radius: 8px;
     margin: 8px 0 12px 0;
-}
-
-.pix-box span {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.pix-box button {
-    background: #25D366;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.pix-box button:hover {
-    opacity: 0.9;
-}
-
-.pix-msg {
-    font-size: 14px;
-    color: green;
-    margin-bottom: 10px;
-}
-
-.pix-box {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* espaço entre o número e o botão */
-    margin-top: 10px;
+    gap: 10px;
 }
 
 .pix-box span {
@@ -260,11 +225,13 @@ button:hover,
     padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
+    background: #25D366;
+    color: white;
+    border: none;
 }
 
-/* Remove layout de imagem quando não existir img */
-.produto:not(:has(.img-produto)) {
-    display: block;
+.pix-box button:hover {
+    opacity: 0.9;
 }
 
 /* ===== LOGIN DA DONA ===== */
@@ -307,7 +274,7 @@ button:hover,
     background: #e68900;
 }
 
-/* ===== PAINEL ADMIN ===== */
+/* ====== PAINEL ADMIN ====== */
 .admin-container {
     max-width: 900px;
     margin: 20px auto;
@@ -339,57 +306,20 @@ button:hover,
     text-decoration: underline;
 }
 
-/* ===== RESPONSIVO PARA MOBILE ===== */
+/* ====== RESPONSIVO ====== */
 @media (max-width: 600px) {
-    .login-container {
-        margin: 30px 10px;
-        padding: 15px;
-    }
-
-    .login-container input,
-    .login-container button {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    .admin-container {
-        margin: 10px 5px;
-        padding: 10px;
-    }
-
-    .admin-container table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        font-size: 12px;
-    }
-
-    .admin-container th, .admin-container td {
-        padding: 6px;
-    }
-}
-
-
-
-@media (max-width: 600px) {
-
     .container {
         padding: 12px;
     }
 
     .produto {
-        display: flex;
+        flex-direction: column;
         gap: 12px;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 16px;
         padding: 12px;
         border-radius: 12px;
     }
-
-    .produto:not(:has(.img-produto)) {
-    display: block;
-}
-
 
     .img-produto {
         width: 120px;
@@ -440,9 +370,4 @@ button:hover,
         margin-bottom: 10px;
         font-size: 16px;
     }
-}
-
-/* Remove espaço da imagem quando NÃO existir img */
-.produto:not(:has(.img-produto)) {
-    display: block !important;
 }

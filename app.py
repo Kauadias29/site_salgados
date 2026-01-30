@@ -51,11 +51,15 @@ class Item(db.Model):
     preco = db.Column(db.Float)
 
 # ================= FUNÇÕES =================
+# ================= FUNÇÕES =================
 def criar_registros_iniciais():
-    if not Loja.query.get(1):
+    # Verifica se a loja existe
+    loja = db.session.get(Loja, 1)
+    if not loja:  # Se não existir, cria
         loja = Loja(id=1, aberta=True)
         db.session.add(loja)
 
+    # Verifica se existem produtos, se não existir, cria alguns
     if Produto.query.count() == 0:
         produtos = [
             Produto(nome="Coxinha", preco=5.00, imagem="Coxinha.png"),
@@ -66,15 +70,12 @@ def criar_registros_iniciais():
 
     db.session.commit()
 
-def salvar_imagem_redimensionada(imagem, caminho):
-    img = Image.open(imagem)
-    img = img.convert("RGB")
-    img.thumbnail(MAX_SIZE)
-    img.save(caminho, optimize=True, quality=85)
 
 def carregar_estado_loja():
-    loja = Loja.query.get(1)
-    return loja.aberta if loja else True
+    loja = db.session.get(Loja, 1)
+    if loja:
+        return loja.aberta  # ✅ Aqui acessamos a instância
+    return False  # Se não existir, considera fechada
 
 # ================= ROTAS =================
 @app.route('/')
@@ -85,6 +86,11 @@ def index():
 
 @app.route('/salvar_pedido', methods=['POST'])
 def salvar_pedido():
+    # ✅ Verifica se a loja está aberta
+    if not carregar_estado_loja():
+        return jsonify({"status": "erro", "mensagem": "A loja está fechada no momento."})
+
+    # Pega os dados do pedido
     data = request.get_json()
     nome = data.get('nome')
     telefone = data.get('telefone')
@@ -93,6 +99,7 @@ def salvar_pedido():
     if not nome or not telefone or not itens:
         return jsonify({"status": "erro", "mensagem": "Dados incompletos"})
 
+    # ✅ Aqui o pedido só é criado se a loja estiver aberta
     total = sum([item["quantidade"] * item["preco"] for item in itens])
     data_pedido = datetime.now().strftime("%d/%m/%Y %H:%M")
 
@@ -107,6 +114,7 @@ def salvar_pedido():
     db.session.add(pedido)
     db.session.commit()
 
+    # Monta mensagem para WhatsApp
     mensagem = f"🧾 Pedido #{pedido.id}\nNome: {nome}\nTelefone: {telefone}\n\nItens:\n"
     for item in itens:
         subtotal = item["quantidade"] * item["preco"]
@@ -121,13 +129,12 @@ def salvar_pedido():
 
 # ================= ADMIN =================
 SENHA_DONA = "123456"
-
 @app.route('/admin')
 def admin():
     if not session.get("logado"):
         return redirect("/admin/login")
     produtos = Produto.query.all()
-    loja_aberta = carregar_estado_loja()
+    loja_aberta = carregar_estado_loja()  # já atualizado
     return render_template("admin.html", produtos=produtos, loja_aberta=loja_aberta)
 
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -141,18 +148,39 @@ def login():
             return "senha incorreta"
     return render_template("login.html")
 
-@app.route('/admin/logout')
-def logout():
-    session.pop("logado", None)
-    return redirect("/admin/login")
-
 @app.route('/admin/toggle_loja')
 def toggle_loja():
-    loja = Loja.query.get(1)
+    loja = db.session.get(Loja, 1)
     if loja:
         loja.aberta = not loja.aberta
         db.session.commit()
     return redirect("/admin")
+
+# ================= FUNÇÕES =================
+def criar_registros_iniciais():
+    # Verifica se a loja existe
+    loja = db.session.get(Loja, 1)
+    if not loja:  # Se não existir, cria
+        loja = Loja(id=1, aberta=True)
+        db.session.add(loja)
+
+    # Verifica se existem produtos, se não existir, cria alguns
+    if Produto.query.count() == 0:
+        produtos = [
+            Produto(nome="Coxinha", preco=5.00, imagem="Coxinha.png"),
+            Produto(nome="Refrigerante", preco=7.00, imagem="sem-imagem.png"),
+            Produto(nome="Cento de salgado", preco=50.00, imagem="sem-imagem.png")
+        ]
+        db.session.add_all(produtos)
+
+    db.session.commit()
+
+
+def carregar_estado_loja():
+    loja = db.session.get(Loja, 1)
+    if loja:
+        return loja.aberta  # ✅ Aqui acessamos a instância
+    return False  # Se não existir, considera fechada
 
 @app.route('/admin/add_produto', methods=['POST'])
 def add_produto():
@@ -178,11 +206,12 @@ def add_produto():
 def remover_produto(id):
     if not session.get("logado"):
         return redirect("/admin/login")
-    produto = Produto.query.get(id)
+    produto = db.session.get(Produto, id)
     if produto:
         db.session.delete(produto)
         db.session.commit()
     return redirect("/admin")
+
 
 # ================= INICIALIZAÇÃO =================
 with app.app_context():
@@ -190,7 +219,7 @@ with app.app_context():
         os.makedirs(UPLOAD_FOLDER)
 
     db.create_all()
-    criar_registros_iniciais()
+    criar_registros_iniciais()  # ✅ Certifique-se que já usa db.session.get dentro
 
 # ================= MAIN =================
 if __name__ == "__main__":
