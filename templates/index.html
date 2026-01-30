@@ -91,6 +91,7 @@
 </div>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const produtos = document.querySelectorAll(".produto");
@@ -115,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         atualizarTotais();
     }
-
 
     // + e -
     produtos.forEach(prod => {
@@ -143,21 +143,28 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Finalizar
+    // FINALIZAR
     btnFinalizar.addEventListener("click", () => {
         if (itens.length === 0) {
             alert("Selecione ao menos um item");
             return;
         }
+
         pixInfo.style.display = "block";
         atualizarTotais();
+
+        // 🔽 scroll automático
+        setTimeout(() => {
+            pixInfo.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 200);
     });
 
     document.getElementById("confirmarPix").addEventListener("click", () => {
         enviarWhats("PIX");
     });
-
-    
 
     function enviarWhats(tipo) {
         const nome = document.getElementById("nome").value;
@@ -192,48 +199,25 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-   const botaoCopiar = document.getElementById("copiarPix");
+    // COPIAR PIX
+    const botaoCopiar = document.getElementById("copiarPix");
 
     if (botaoCopiar) {
         botaoCopiar.addEventListener("click", async () => {
             const chavePix = document.getElementById("pixChave").innerText;
 
-        // Tenta copiar automaticamente
-        try {
-            await navigator.clipboard.writeText(chavePix);
-            botaoCopiar.innerText = "✅ Copiado!";
-            setTimeout(() => {
-                botaoCopiar.innerText = "📋 Copiar";
-            }, 2000);
-            return;
-        } catch (err) {
-            // Se não der, cai no fallback
-        }
-
-        // Fallback (funciona em praticamente todos os navegadores)
-        const textarea = document.createElement("textarea");
-        textarea.value = chavePix;
-        document.body.appendChild(textarea);
-        textarea.select();
-        textarea.setSelectionRange(0, 99999);
-
-        try {
-            document.execCommand("copy");
-            botaoCopiar.innerText = "✅ Copiado!";
-            setTimeout(() => {
-                botaoCopiar.innerText = "📋 Copiar";
-            }, 2000);
-        } catch (err) {
-            alert("Não foi possível copiar automaticamente. Selecione o número e copie manualmente.");
-        }
-
-        document.body.removeChild(textarea);
-    });
-}
-
-
+            try {
+                await navigator.clipboard.writeText(chavePix);
+                botaoCopiar.innerText = "✅ Copiado!";
+                setTimeout(() => botaoCopiar.innerText = "📋 Copiar", 2000);
+            } catch {
+                alert("Não foi possível copiar automaticamente.");
+            }
+        });
+    }
 
 });
+
 </script>
 
 </body>
